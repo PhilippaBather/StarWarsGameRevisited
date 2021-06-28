@@ -2,6 +2,10 @@ package domain;
 
 import java.util.Random;
 
+/**
+ * Class creates game board object and contains methods to populate and
+ * repopulate the board according to the game play.
+ */
 public class Board {
 
     // member fields
@@ -26,6 +30,10 @@ public class Board {
 
     // other methods
 
+    public String getBoardCounter(int row, int col) {
+        return board[row][col];
+    }
+
     /**
      * Populates board with F for Free.
      */
@@ -49,7 +57,7 @@ public class Board {
             row = randomNumberGenerator.nextInt(ROWS);
             if (this.board[row][col].equals(FREE)) {
                 this.board[row][col] = player.getPlayerCounter();
-                int[][] coordinates = {{row}, {col}};
+                int[] coordinates = {row, col};
                 player.setCoordinates(coordinates);
                 isValidCoordinate = true;
             }
@@ -73,6 +81,18 @@ public class Board {
                 count++;
             }
         }
+    }
+
+    /**
+     * Repopulate board with player in new position.
+     */
+    public void repopulateBoard() {
+        int row = player.getCoordinateRow();
+        int col = player.getCoordinatesColumn();
+
+        fillBoardFree();                                // fill free squares
+        board[row][col] = player.getPlayerCounter();    // reposition player
+        addEnemies();                                   // add enemies
     }
 
     /**

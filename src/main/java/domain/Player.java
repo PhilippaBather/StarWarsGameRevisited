@@ -1,5 +1,8 @@
 package domain;
 
+/**
+ * Player class creates a template for the different players.
+ */
 public abstract class Player {
 
     // instance fields
@@ -9,7 +12,7 @@ public abstract class Player {
     private int lives;
     private int enemies;
     // private int potions;     // TODO
-    private int[][] coordinates;
+    private int[] coordinates;
     private boolean isWinner;
 
     // constructor
@@ -20,12 +23,11 @@ public abstract class Player {
         this.enemyCounter = enemyCounter;
         this.lives = 3;
         this.enemies = 5;
-        this.coordinates = new int[1][1];
+        this.coordinates = new int[2];
         this.isWinner = false;
     }
 
     // getters and setters
-
 
     public String getName() { return name; }
 
@@ -65,19 +67,19 @@ public abstract class Player {
         this.enemies = enemies;
     }
 
-    public int[][] getCoordinates() {
+    public int[] getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(int[][] coordinates) {
+    public void setCoordinates(int[] coordinates) {
         this.coordinates = coordinates;
     }
 
-    public boolean isWinner() {
-        return isWinner;
+    public int getCoordinateRow() {
+        return coordinates[0];
     }
 
-    public void setWinner(boolean winner) {
-        isWinner = winner;
+    public int getCoordinatesColumn() {
+        return coordinates[1];
     }
 }

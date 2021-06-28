@@ -36,13 +36,30 @@ public class Menu {
             printBoard(currentBoard);
 
             // get next move from current player
-            getNextMove();
+            getNextMove(currentPlayer.getCoordinates());
+
+            // check for enemies
+            checkForEnemy(currentPlayer, currentBoard);
+            // check for potions
+            // TODO
 
             // check for win
             quit = checkGameState(currentPlayer);
 
+            // print appropriate winning message if quit
+            if (quit) {
+                if (player == 1) {
+                    System.out.println(darthVader.getName() + " ¡¡¡GANA!!!");
+                } else {
+                    System.out.println(yoda.getName() + " ¡¡¡GANA!!!");
+                }
+            }
+
+            // update board
+            currentBoard.repopulateBoard();
+
             // change player
-            player = (player == 1) ? 2 : 1;
+            //player = (player == 1) ? 2 : 1;
 
         } while(!quit);
     }
@@ -94,32 +111,51 @@ public class Menu {
      */
     private static void repopulateBoard() {
         // TODO
+
     }
 
     /**
-     * Obtains user move.
+     * Obtains the user's move and checks for an outOfBoundsException.
+     * Prompts user until a valid move - correct input and within bounds
+     * is introduced.
+     * @param coordinates of current player on board
+     * @return boolean isValid
      */
-    private static void getNextMove() {
+    private static void getNextMove(int[] coordinates) {
         boolean isValid = false;
 
-        System.out.println("\nEnter move: ");
-        String move = scanner.nextLine().toUpperCase();
-
+        // cycles through loop until is valid = true
         while (!isValid) {
+            System.out.println("\nEnter move: ");
+            String move = scanner.nextLine().toUpperCase();
             switch (move) {
                 case "D":       // right
-                    isValid = checkMoveValid();
+                    if ((coordinates[1] + 1) < 5) {
+                        coordinates[1]++;
+                        isValid = true;
+                    }
                     break;
                 case "A":       // left
+                    if ((coordinates[1] - 1) >= 0) {
+                        coordinates[1]--;
+                        isValid = true;
+                    }
                     break;
                 case "W":       // up
+                    if ((coordinates[0] - 1) >= 0) {
+                        coordinates[0]--;
+                        isValid = true;
+                    }
                     break;
                 case "S":       // down
+                    if ((coordinates[0] + 1) < 5){
+                        coordinates[0]++;
+                        isValid = true;
+                    }
                     break;
-                default:
-                    System.out.println("\nIntroduzca un movimiento válido\nD (derecha), A (izquierda), W (arriba), S (abajo)");
-                    isValid = true; // CHANGE THIS - UNNECESSARY; HERE TO STOP AN INFINITE LOOP
-
+            }
+            if (!isValid) {
+                System.out.println("\nIntroduzca un movimiento válido\nD (derecha), A (izquierda), W (arriba), S (abajo)");
             }
         }
     }
@@ -129,6 +165,7 @@ public class Menu {
      */
     private static boolean checkMoveValid() {
         // TODO
+
         // out of bounds: false
         // life lost: true (but decrement lives and enemy coutners)
         // potion received: true (but increment lives)
@@ -138,19 +175,18 @@ public class Menu {
     }
 
     /**
-     * Checks that the move is within the bounds of the board.
+     * Checks if enemy is on the coordinate destination and deletes a life and the
+     * number of enemies accordingly.
      */
-    private static void checkOutOfBounds() {
-        // TODO
-    }
-
-    /**
-     * Checks if enemy is on the coordinate destination.
-     */
-    private static void checkForEnemy() {
-        // TODO
-        // if enemy: decrement player's life counter
-        // if enemy: decrement player's enemy counter
+    private static void checkForEnemy(Player currentPlayer, Board currentBoard) {
+        // saved to local variables for readability
+        int row = currentPlayer.getCoordinateRow();
+        int col = currentPlayer.getCoordinatesColumn();
+        if (currentBoard.getBoardCounter(row, col).equals(currentPlayer.getEnemyCounter())) {
+            currentPlayer.setLives(currentPlayer.getLives() - 1);       // decrement lives
+            currentPlayer.setEnemies(currentPlayer.getEnemies() - 1);   // decrement enemy counters
+            System.out.println("¡Hay un enimigo aquí!  Has perdido una vida");
+        }
     }
 
     /**
@@ -163,13 +199,6 @@ public class Menu {
     }
 
     /**
-     * Removes life if player lands on an enemy.
-     */
-    private static void deleteLife() {
-        // TODO
-    }
-
-    /**
      * Adds life if player lands on a potion.
      */
     private static void addLife() {
@@ -177,8 +206,7 @@ public class Menu {
     }
 
     private static boolean checkGameState(Player currentPlayer) {
-        if (currentPlayer.isWinner()) {     // if true
-            System.out.println("\n" + currentPlayer.getName() + " GANA!!!!");
+        if (currentPlayer.getLives() == 0) {     // if true
             return true;
         }
         return false;
