@@ -6,14 +6,14 @@ package domain;
 public abstract class Player {
 
     // instance fields
-    private String name;
-    private String playerCounter;
-    private String enemyCounter;
+    private final String name;
+    private final String playerCounter;
+    private final String enemyCounter;
+    private final String potionCounter;
     private int lives;
     private int enemies;
-    // private int potions;     // TODO
+    private int potions;
     private int[] coordinates;
-    private boolean isWinner;
 
     // constructor
 
@@ -21,34 +21,23 @@ public abstract class Player {
         this.name = name;
         this.playerCounter = playerCounter;
         this.enemyCounter = enemyCounter;
+        this.potionCounter = "P";
         this.lives = 3;
-        this.enemies = 5;
+        this.enemies = 6;
+        this.potions = 3;
         this.coordinates = new int[2];
-        this.isWinner = false;
     }
 
     // getters and setters
 
     public String getName() { return name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPlayerCounter() {
         return playerCounter;
     }
 
-    public void setPlayerCounter(String playerCounter) {
-        this.playerCounter = playerCounter;
-    }
-
     public String getEnemyCounter() {
         return enemyCounter;
-    }
-
-    public void setEnemyCounter(String enemyCounter) {
-        this.enemyCounter = enemyCounter;
     }
 
     public int getLives() {
@@ -66,6 +55,12 @@ public abstract class Player {
     public void setEnemies(int enemies) {
         this.enemies = enemies;
     }
+
+    public String getPotionCounter() { return potionCounter; }
+
+    public int getPotions() { return potions; }
+
+    public void setPotions(int potions) { this.potions = potions; }
 
     public int[] getCoordinates() {
         return coordinates;

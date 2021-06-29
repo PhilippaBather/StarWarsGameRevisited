@@ -1,13 +1,11 @@
 package com.philippa.Main;
 
-import domain.*;
-
+/**
+ * MAIN class.
+ */
 public class Main {
 
     public static void main(String[] args) {
         Menu.executeMenu();
-
     }
-
-
 }

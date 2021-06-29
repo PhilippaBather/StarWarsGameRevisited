@@ -11,6 +11,7 @@ public class Menu {
 
     private static int player = 1;  // keeps track of player
     private static final Scanner scanner = new Scanner(System.in);
+    private static final String ROUTE_PROHIBITED = "¡No hagas trampas!  Este camino está prohibido.";
 
     public static void executeMenu() {
         boolean quit;
@@ -20,32 +21,19 @@ public class Menu {
         Player darthVader = new DarthVader();
         Board darthBoard = new Board(darthVader);
 
-        // print opening blurb
+        // print opening message with game instructions
         openingMessage();
 
-        // begin do-while loop
         do {
-            // print lives score
             printLivesScore(yoda, darthVader);
-
             // adjust player and their board using a copy of the appropriate player and board objects
             Player currentPlayer = (player == 1) ? yoda : darthVader;
             Board currentBoard = (player == 1) ? yodaBoard : darthBoard;
-
-            // print current player's board
             printBoard(currentBoard);
-
-            // get next move from current player
             getNextMove(currentPlayer.getCoordinates());
-
-            // check for enemies
             checkForEnemy(currentPlayer, currentBoard);
-            // check for potions
-            // TODO
-
-            // check for win
+            checkForPotion(currentPlayer, currentBoard);
             quit = checkGameState(currentPlayer);
-
             // print appropriate winning message if quit
             if (quit) {
                 if (player == 1) {
@@ -53,14 +41,10 @@ public class Menu {
                 } else {
                     System.out.println(yoda.getName() + " ¡¡¡GANA!!!");
                 }
+            } else {
+                currentBoard.repopulateBoard();     // update board
+                player = (player == 1) ? 2 : 1;     // change player
             }
-
-            // update board
-            currentBoard.repopulateBoard();
-
-            // change player
-            //player = (player == 1) ? 2 : 1;
-
         } while(!quit);
     }
 
@@ -94,8 +78,8 @@ public class Menu {
      */
     private static void printLivesScore(Player player1, Player player2 ) {
         System.out.println("*********************Vidas*********************\n"
-                + "Jugador 1: Yoda - " + player1.getLives() +
-                "\nJugador 2: Darth Vader - " + player2.getLives() + "\n"
+                + "Jugador 1 Yoda : " + player1.getLives() +
+                "\nJugador 2 Darth Vader : " + player2.getLives() + "\n"
                 + "***********************************************");
     }
 
@@ -107,21 +91,12 @@ public class Menu {
     }
 
     /**
-     * Repopulates player's board if move is valid.
-     */
-    private static void repopulateBoard() {
-        // TODO
-
-    }
-
-    /**
      * Obtains the user's move and checks for an outOfBoundsException.
      * Prompts user until a valid move - correct input and within bounds
      * is introduced.
      * @param coordinates of current player on board
-     * @return boolean isValid
      */
-    private static void getNextMove(int[] coordinates) {
+     private static void getNextMove(int[] coordinates) {
         boolean isValid = false;
 
         // cycles through loop until is valid = true
@@ -132,12 +107,20 @@ public class Menu {
                 case "D":       // right
                     if ((coordinates[1] + 1) < 5) {
                         coordinates[1]++;
-                        isValid = true;
+                    } else {
+                        coordinates[1] = 0;
                     }
+                    isValid = true;
                     break;
                 case "A":       // left
                     if ((coordinates[1] - 1) >= 0) {
                         coordinates[1]--;
+                        isValid = false;
+                    } else if (coordinates[0] == 4 && coordinates[1] == 0) {        // move not permitted at board coordinates[4][0]
+                        System.out.println(ROUTE_PROHIBITED);
+                        isValid = false;
+                    } else {                    // reappear on right side of board
+                        coordinates[1] = 4;
                         isValid = true;
                     }
                     break;
@@ -145,33 +128,92 @@ public class Menu {
                     if ((coordinates[0] - 1) >= 0) {
                         coordinates[0]--;
                         isValid = true;
+                    } else if (coordinates[0] == 0 && coordinates[1] == 4) {
+                        System.out.println(ROUTE_PROHIBITED);                       // move not permitted at board coordinates[0][4]
+                        isValid = false;
+                    } else {
+                        coordinates[0] = 4;      // reapear at the top of the board
+                        isValid = true;
                     }
                     break;
                 case "S":       // down
                     if ((coordinates[0] + 1) < 5){
                         coordinates[0]++;
+                    } else {                    // reappear at the bottom of the board
+                        coordinates[0] = 0;
+                    }
+                    isValid = true;
+                    break;
+                case "E":       // right-up
+                    if ((coordinates[1] + 1) < 5 && (coordinates[0] - 1) >= 0) {
+                        coordinates[1]++;
+                        coordinates[0]--;
+                    } else {
+                        if (coordinates[0] == 0) {      // reappear at corresponding position to left of board
+                            coordinates[0] = coordinates[1];
+                            coordinates[1] = 0;
+                        } else {                        // reappear at corresponding position at bottom of board
+                            coordinates[1] = coordinates[0];
+                            coordinates[0] = (Board.getROWS() - 1);
+                        }
+                    }
+                    isValid = true;
+                    break;
+                case "X":       // diagonal: right-down
+                    if ((coordinates[1] + 1) < 5 && (coordinates[0] + 1) < 5) {
+                        coordinates[1]++;
+                        coordinates[0]++;
+                    } else {
+                        if (coordinates[1] == 4) {      // reappear at corresponding position at top of board
+                            coordinates[1] = coordinates[1] - coordinates[0];
+                            coordinates[0] = 0;
+                        } else {                        // reappear at corresponding position to left of board
+                            int swap = coordinates[1];
+                            coordinates[1] = ((Board.getCOLUMNS() - 1) - coordinates[0]);
+                            coordinates[0] = swap;
+                        }
+                    }
+                    isValid = true;
+                    break;
+                case "Q":       // diagonal: left-up
+                    if ((coordinates[1] - 1) >= 0 && (coordinates[0] - 1) >= 0) {
+                        coordinates[1]--;
+                        coordinates[0]--;
+                        isValid = true;
+                    } else if (coordinates[1] == 0 && coordinates[0] == 0) {        // move invalid if counter at board's coordinates[0][0]
+                        System.out.println(ROUTE_PROHIBITED);
+                        isValid = false;
+                    } else {
+                        if (coordinates[1] == 0) {          // reappear at corresponding position at bottom of board
+                            coordinates[1] = ((Board.getCOLUMNS() - 1) - coordinates[0]);
+                            coordinates[0] = Board.getROWS() - 1;
+                        } else {                            // reappear at corresponding position at right of board
+                            coordinates[0] = ((Board.getROWS() - 1) - coordinates[1]);
+                            coordinates[1] = Board.getCOLUMNS() - 1;
+                        }
                         isValid = true;
                     }
+                    break;
+                case "Z":       // diagonal: left-down
+                    if ((coordinates[1] - 1) >= 0 && (coordinates[0] + 1) < 5) {
+                        coordinates[1]--;
+                        coordinates[0]++;
+                    } else {
+                        if (coordinates[1] == 0) {          // reappear at corresponding position at top of board
+                            coordinates[1] = coordinates[0];
+                            coordinates[0] = 0;
+                        } else {                            // reappear at corresponding position to right of board
+                            coordinates[0] = coordinates[1];
+                            coordinates[1] = Board.getCOLUMNS() - 1;
+                        }
+                    }
+                    isValid = true;
                     break;
             }
             if (!isValid) {
                 System.out.println("\nIntroduzca un movimiento válido\nD (derecha), A (izquierda), W (arriba), S (abajo)");
             }
         }
-    }
-
-    /**
-     * Determines if move valid.
-     */
-    private static boolean checkMoveValid() {
-        // TODO
-
-        // out of bounds: false
-        // life lost: true (but decrement lives and enemy coutners)
-        // potion received: true (but increment lives)
-        // life lost?: true (but lives need adjusting)
-        return false;
-
     }
 
     /**
@@ -192,23 +234,22 @@ public class Menu {
     /**
      * Checks if potion is on the coordinate destination.
      */
-    private static void checkForPotion() {
-        // TODO
-        // if potion: increment player's life counter
-        // if potion: decrement potions
+    private static void checkForPotion(Player currentPlayer, Board currentBoard) {
+        int row = currentPlayer.getCoordinateRow();
+        int col = currentPlayer.getCoordinatesColumn();
+        if (currentBoard.getBoardCounter(row, col).equals(currentPlayer.getPotionCounter())) {
+            currentPlayer.setLives(currentPlayer.getLives() + 1);
+            currentPlayer.setPotions(currentPlayer.getPotions() - 1);
+            System.out.println("¡Hay una pócima aquí.  Has conseguido una vida más.");
+        }
     }
 
     /**
-     * Adds life if player lands on a potion.
+     * Checks game state to see if the current player has lost (has zero lives).
+     * @param currentPlayer object
+     * @return boolean player has lost
      */
-    private static void addLife() {
-        // TODO
-    }
-
     private static boolean checkGameState(Player currentPlayer) {
-        if (currentPlayer.getLives() == 0) {     // if true
-            return true;
-        }
-        return false;
+        return currentPlayer.getLives() == 0;
     }
 }

@@ -15,7 +15,7 @@ public class Board {
     private static final int ROWS = 5;
 
     // instance fields
-    private final String[][] board;
+    private String[][] board;
     Player player;
 
     // constructor      // player passed to populate board with counters specific to character
@@ -26,7 +26,19 @@ public class Board {
         fillBoardFree();
         addPlayer();
         addEnemies();
+        addPotions();
     }
+
+    // getters and setters
+
+    public static int getCOLUMNS() {
+        return COLUMNS;
+    }
+
+    public static int getROWS() {
+        return ROWS;
+    }
+
 
     // other methods
 
@@ -46,7 +58,8 @@ public class Board {
     }
 
     /**
-     * Populates board with player
+     * Populates board initially with a player counter placed
+     * randomly.
      */
     private void addPlayer() {
         int col, row;
@@ -65,7 +78,7 @@ public class Board {
     }
 
     /**
-     * Populates the board with 5 enemies using Random
+     * Populates the board with enemies using Random
      * to generate a coordinate.  The coordinate to be populated
      * must be a Free square.
      */
@@ -84,15 +97,34 @@ public class Board {
     }
 
     /**
+     * Populates board with Potions.  The coordinate to be populated
+     * must be a Free square.
+     */
+    private void addPotions() {
+        int col, row;
+        int count = 0;
+
+        while (count < player.getPotions()) {
+            col = randomNumberGenerator.nextInt(COLUMNS);
+            row = randomNumberGenerator.nextInt(ROWS);
+            if (this.board[row][col].equals(FREE)) {
+                this.board[row][col] = player.getPotionCounter();
+                count++;
+            }
+        }
+    }
+
+    /**
      * Repopulate board with player in new position.
      */
     public void repopulateBoard() {
         int row = player.getCoordinateRow();
         int col = player.getCoordinatesColumn();
 
-        fillBoardFree();                                // fill free squares
+        fillBoardFree();
         board[row][col] = player.getPlayerCounter();    // reposition player
-        addEnemies();                                   // add enemies
+        addEnemies();
+        addPotions();
     }
 
     /**
