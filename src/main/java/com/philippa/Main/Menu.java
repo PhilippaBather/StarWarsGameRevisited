@@ -211,7 +211,8 @@ public class Menu {
                     break;
             }
             if (!isValid) {
-                System.out.println("\nIntroduzca un movimiento válido\nD (derecha), A (izquierda), W (arriba), S (abajo)");
+                System.out.println("\nIntroduzca un movimiento válido\nD (derecha), A (izquierda), W (arriba), S (abajo), Derecha-Arriba (E), " +
+                        "Izquierda-Arriba (Q), Derecha-Abajo (X) y Izquerida-Abajo (Z)");
             }
         }
     }
