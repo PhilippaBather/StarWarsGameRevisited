@@ -3,7 +3,7 @@ package domain;
 /**
  * Player class creates a template for the different players.
  */
-public abstract class Player {
+public class Player {
 
     // instance fields
     private final String name;
