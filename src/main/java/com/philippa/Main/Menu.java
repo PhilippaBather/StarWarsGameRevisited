@@ -115,7 +115,7 @@ public class Menu {
                 case "A":       // left
                     if ((coordinates[1] - 1) >= 0) {
                         coordinates[1]--;
-                        isValid = false;
+                        isValid = true;
                     } else if (coordinates[0] == 4 && coordinates[1] == 0) {        // move not permitted at board coordinates[4][0]
                         System.out.println(ROUTE_PROHIBITED);
                         isValid = false;
@@ -211,7 +211,8 @@ public class Menu {
                     break;
             }
             if (!isValid) {
-                System.out.println("\nIntroduzca un movimiento válido\nD (derecha), A (izquierda), W (arriba), S (abajo)");
+                System.out.println("\nIntroduzca un movimiento válido\nD (derecha), A (izquierda), W (arriba), S (abajo), Derecha-Arriba (E), " +
+                        "Izquierda-Arriba (Q), Derecha-Abajo (X) y Izquerida-Abajo (Z)");
             }
         }
     }
